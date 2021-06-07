@@ -48,14 +48,14 @@ def player_card_reader(p_hand, points):
         points -= 10
     final_string = start_string[:-9] + ". That's " + str(points) + " points." 
     print(final_string)
-def dealer_card_reader(d_hand, starting_index):
+"""def dealer_card_reader(d_hand, starting_index):
     points_showing = 0
     start_string = "The dealer has: the "
     for i in range(starting_index, len(d_hand)):
         start_string += d_hand[i][0] + " of " + d_hand[i][1] + " and the "
         points_showing += d_hand[i][2]
     final_string = start_string[:-9] + " showing. That's " + str(points_showing) + " points."
-    print(final_string)
+    print(final_string)"""
 def dealer_card_reader_2(d_hand, add_length):
     points_showing = d_hand[0][2]
     start_string = "The dealer has the "
@@ -67,7 +67,7 @@ def dealer_card_reader_2(d_hand, add_length):
     if hand_length > 2:
         for i in range(1,len(d_hand)):
             points_showing += d_hand[i][2]
-            start_string += " and the " + d_hand[i][0] + " of " + d_hand[i][1] + " and the "
+            start_string += " and the " + d_hand[i][0] + " of " + d_hand[i][1] 
             final_string = start_string[:-9] + " showing. That's " + str(points_showing) + " points."
     print(final_string)
     #else:
@@ -113,13 +113,13 @@ def deal():
         player_points -= 10
         contains_ace(player_hand)[1] = 1
     player_card_reader(player_hand, player_points)
-    print(str(count))
     print(get_count())
     #print(player_hand)
     #print(player_points)
     #print(count)
     deal_robot_players(charles_hand, isaac_hand)
-    print(str(count))
+    print(get_count())
+    #remove
     #dealer_hand.append(new_decks[0])
     #dealer_hand.append(new_decks.pop())
     #dealer_points = dealer_hand[0][2] + dealer_hand[1][2]
@@ -129,51 +129,36 @@ def deal():
 
     dealer_points = dealer_hand[0][2] + dealer_hand[1][2]
     count += dealer_hand[0][3]
-    print(str(count))
+    #print(get_count())
     #print(dealer_hand[1])
     #print(dealer_points)
     #print(count)
     dealer_card_reader_2(dealer_hand, 0)
-    print(player_hand)
-    print(str(count))
+    print(get_count())
     player_blackjack = False
     dealer_blackjack = False
-    print(str(player_points) + "test")
-    if player_points > 21:
-        #testing which statement it enters
-        print("test1")
     if player_points == 21 and dealer_points != 21:
         print("Congratulations! You have Blackjack and automatically win 150% of your bet! That's " + str(1.5 * bet) + " dollars!")
         player_blackjack = True
         dealer_hand[0] = new_decks.pop(0)
         count += dealer_hand[0][3]
-        print(dealer_hand)
-        #testing which statement it enters
-        print("test2")
     elif player_points != 21 and dealer_points == 21:
         print("The dealer has Blackjack and you dont. You lost " + str(bet) + " dollars. Good luck next hand.")
         dealer_blackjack = True
         dealer_hand[0] = new_decks.pop(0)
         count += dealer_hand[0][3]
         player_points = -1
-        #testing which statement it enters
-        print("test3")
     elif player_points < 21 and dealer_points != 21:
         hit = "NO"
-        #testing which statement it enters
-        print("test4")
         double_down = input("Would you like to double down? Enter YES or NO.\n")
-        print(player_points)
+        #print(player_points)
         if double_down == "YES":
             bet *= 2
-            #uncomment line below
-            #player_hand.append(new_decks.pop())
-            #testing aces
-            player_hand.append(["Ace", "Clubs", 11, -1])
+            player_hand.append(new_decks.pop())
+
             player_points += player_hand[2][2]
             count += player_hand[2][3]
-            print(player_hand)
-            print(str(count))
+            print(get_count())
             #adding ace handling code
             ace = contains_ace(player_hand)
             has_ace = ace[0]
@@ -186,29 +171,23 @@ def deal():
                     ask_to_hit_again = False
                 ace = contains_ace(player_hand)                    
                 has_ace = ace[0]
-                print(player_points)
+                #print(player_points)
             player_card_reader(player_hand, player_points)
         else:
-            print(player_points)
+            #print(player_points)
             hit = input("Would you like to hit? Enter YES or NO\n")
-            print(player_points)
-        print(str(player_points) + "test before hitting")
+            #print(player_points)
+        #print(str(player_points) + "test before hitting")
         player_index = 2
         while hit == "YES" and player_points < 21 and double_down != "YES":
-            #PRINT TEST FOR DEBUGGING
-            print("test100")
             ask_to_hit_again = True
-            #TESTING WITH ACES UNCOMMENT LINE LATER
-            #player_hand.append(new_decks.pop())
-            player_hand.append(["Ace", "Clubs", 11, -1])
+            player_hand.append(new_decks.pop())
             player_points += player_hand[player_index][2]
             count += player_hand[player_index][3]
             player_index += 1
             ace = contains_ace(player_hand)
             has_ace = ace[0]
-            #PRINT TEST FOR DEBUGGING
-            print("test100")
-            print(player_hand)
+            #print(player_hand)
             player_card_reader(player_hand, player_points)
             if (player_points > 21 and has_ace == False) or player_points > 31 :
                 hit = "NO"
@@ -228,7 +207,7 @@ def deal():
             #CHANGING IF TO ELIF
             elif player_points < 21 and ask_to_hit_again == True:
                 hit = input("Would you like to hit? Enter YES or NO\n")
-            print(str(count))
+            print(get_count())
         '''hit = "NO"
         #testing which statement it enters
         print("test4")
@@ -350,7 +329,7 @@ def deal():
         dealer_card_reader_2(dealer_hand, 3)
         #count += dealer_hand[0][3]
         count += dealer_hand[1][3]
-        print(str(count))
+        print(get_count())
         #print(dealer_hand)
         dealer_index = 2
         while dealer_points < 17 and dealer_points < 21:
@@ -361,7 +340,7 @@ def deal():
         #    print(dealer_hand)
             print("The dealer has less than 17 and must hit.")
             dealer_card_reader_2(dealer_hand, 3)
-            print(str(count))
+            print(get_count())
         """if player_points > 21:
             print("You busted. You lost " + str(bet) + " dollars.")
             money -= bet
@@ -385,8 +364,6 @@ def deal():
     else:
         print("It has been nice playing with you!")
         exit
-
-
 
 deal()
 
