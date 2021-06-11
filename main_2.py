@@ -9,6 +9,11 @@ new_decks = []
 money = 1000
 count = 0
 
+def surrender(will_surrender, bet):
+    global money
+    if will_surrender == "YES":
+        money -= (bet/2)
+
 def shuffle_decks(num_decks):
     for i in range(num_decks):
         new_decks.extend(starting_deck)
@@ -174,6 +179,8 @@ def deal():
     dealer_hand = []
     dealer_points = 0
     player_hand = []
+    split_cards_hands = []
+    split_cards_points = []
 
     player_points = 0
     charles_hand = []
@@ -293,7 +300,6 @@ def deal():
         print("The dealer has less than 17 and must hit.")
         dealer_card_reader(dealer_hand, 3)
         print(get_count())
-    print(player_points)
     # line below has been unindented
     who_won(player_points, dealer_points, bet, "You", player_blackjack, dealer_blackjack)
     print("The count is " + str(count) + ".\n")
