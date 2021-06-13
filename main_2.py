@@ -9,11 +9,6 @@ new_decks = []
 money = 1000
 count = 0
 
-def surrender(will_surrender, bet):
-    global money
-    if will_surrender == "YES":
-        money -= (bet/2)
-
 def shuffle_decks(num_decks):
     for i in range(num_decks):
         new_decks.extend(starting_deck)
@@ -32,13 +27,7 @@ def get_player_hand():
 def get_dealer_hand():
     return dealer_hand
 
-def can_split(p_hand):
-    if p_hand[0][0] == p_hand[1][0]:
-        return True
-    return False
 
-def splitting_cards(d_hand):
-    return False
 # Robot players will be dealt 2 cards each at the beginning of a turn. They won't hit or double down>
 # Robot players are there to allow the real player to see and count more cards per turn
 
@@ -61,9 +50,9 @@ def contains_ace(lst):
         card_index += 1
     return [False, 999]
 
-def player_card_reader(p_hand, points):
+def player_card_reader(p_hand, points, hand_number):
     points = points 
-    start_string = "You've been dealt: the "
+    start_string = "Your hand number " +  str(hand_number + 1) + " is the "
     for cards in p_hand:
         start_string += cards[0] + " of " + cards[1] + " and the "
     if points > 21 and contains_ace(p_hand)[0]:
@@ -146,9 +135,13 @@ def hit(p_hand, player_points, will_hit):
                 will_hit = input("Would you like to hit? Enter YES or NO\n")
         return player_points
 
-def who_won(player_points, dealer_points, bet, player_name, player_blackjack, dealer_blackjack):
+def who_won(player_points, dealer_points, bet, player_name, player_blackjack, dealer_blackjack, will_surrender):
     global money
-    if player_points > 21:
+    if will_surrender == "YES":
+        bet *= 0.5
+        print(player_name + " surrendered and lost half of your bet. Thats " + str(int(bet)) + " dollars. Good luck next hand.\n")
+        money -= bet
+    elif player_points > 21:
         print(player_name + " busted and the dealer didn't." + player_name + " lost " + str(int(bet)) + " dollars.")
         money -= bet
     elif player_blackjack and not dealer_blackjack:
@@ -172,6 +165,57 @@ def who_won(player_points, dealer_points, bet, player_name, player_blackjack, de
         money += bet
     print("You have " + str(int(money)) + " dollars.")
 
+def can_split(split_cards_hands):
+    for hand in split_cards_hands:
+        if hand[0][2] == hand[1][2] and len(hand) == 2:
+            return True
+    return False
+    
+def split_cards(split_cards_hands):
+   # hand_number = 0
+    will_split = "NO"
+    for hand in split_cards_hands:
+        # adding player_card_reader
+        
+        will_split_list.append("YES")
+        for i in range(len(split_cards_hands)):
+            h_points = 0
+            for j in range(len(hand) - 1):
+                h_points += hand[j][2]
+            hand_number = i
+            player_card_reader(split_cards_hands[i], h_points, hand_number)
+        if hand[0][2] == hand[1][2] and hand[2] == "YES":
+            #hand_number += 1
+            #adding player_card_reader
+            #h_points = 0
+            #for i in range(len(hand) - 1):
+            #    h_points += hand[i][2]
+            #hand_number = split_cards_hands.index(hand) + 1
+            #player_card_reader(hand, h_points, hand_number)
+            will_split = input("You can split hand " + str(split_cards_hands.index(hand) + 1) + " would you like to?\n").upper()
+            hand_index = split_cards_hands.index[hand]
+            will_split_list[hand_index] = will_split
+            print(will_split)
+            if will_split == "YES":
+                split_cards_hands.append([hand[1], new_decks.pop()])
+                hand[1] = new_decks.pop()
+                print(split_cards_hands)
+            else:
+                break
+        #for h in split_cards_hands:
+            #print(hand)
+def hand_points(player_hand):
+    hand_points = 0
+    for cards in player_hand:
+        #count
+        hand_points += cards[2]
+        #count += cards[3]
+    if contains_ace(player_hand)[0] and hand_points > 21:
+        hand_points -= 10
+        contains_ace(player_hand)[1] = 1
+    return hand_points
+        
+
 # Main function called for each turn of blackjack
 def deal():
     global count
@@ -179,10 +223,10 @@ def deal():
     dealer_hand = []
     dealer_points = 0
     player_hand = []
-    split_cards_hands = []
-    split_cards_points = []
-
     player_points = 0
+    split_cards_hands = [player_hand]
+    will_split_list = []
+    split_cards_points = []
     charles_hand = []
     isaac_hand = []
     bet = int(input("How much do you want to bet?\n"))
@@ -190,8 +234,13 @@ def deal():
         bet = int(input("You don't have that much money. How much do you want to bet?\n"))
     
     # Initializing the player's hand
-    player_hand.append(new_decks.pop())
-    player_hand.append(new_decks.pop())
+    # uncomment 2 lines below
+    #player_hand.append(new_decks.pop())
+    #player_hand.append(new_decks.pop())
+    # testing split delete two lines below after testing
+    player_hand.append(["Queen", "Spades", 10, -1])
+    player_hand.append(["King", "Clubs", 10, -1])
+    # following 9 lines commented out to try and replace with hand_point function
     for cards in player_hand:
         count
         player_points += cards[2]
@@ -199,7 +248,38 @@ def deal():
     if contains_ace(player_hand)[0] and player_points > 21:
         player_points -= 10
         contains_ace(player_hand)[1] = 1
-    player_card_reader(player_hand, player_points)
+    player_card_reader(player_hand, player_points, 0)
+
+    print(player_hand)
+
+    print(can_split(player_hand))
+    will_split = "YES"
+    # runs through hands to split if wanted
+    for i in range(3):
+        if can_split(split_cards_hands):
+            split_cards(split_cards_hands) 
+
+    """while can_split(split_cards_hands) == True and len(split_cards_hands) < 4:
+        #can_split(split_cards_hands)
+        #split_cards(split_cards_hands)  
+        #following 8 lines are an attempt to print off each hand
+        for player_hand in split_cards_hands:
+            #for cards in player_hand:
+                #count
+                #player_points += cards[2]
+                #count += cards[3]
+                #if contains_ace(player_hand)[0] and player_points > 21:
+                    #player_points -= 10
+                    #contains_ace(player_hand)[1] = 1
+            split_cards(split_cards_hands)  
+            #for player_hand in split_cards_hands:
+            hand_number = split_cards_hands.index(player_hand)
+            player_points = hand_points(player_hand)
+            player_card_reader(player_hand, player_points, hand_number)
+            # repositioning split_cards to test if it works
+    """
+            
+
     print(get_count())
     deal_robot_players(charles_hand, isaac_hand)
     print(get_count())
@@ -214,82 +294,29 @@ def deal():
     # Blackjack is when a player or the dealer is dealt cards adding up to 21 in their opening hand
     player_blackjack = False
     dealer_blackjack = False
+    will_surrender = "NO"
     if player_points == 21:
         player_blackjack = True
+    else:
+        will_surrender = input("Would you like to surrender?\n").upper()
     if dealer_points == 21:
         dealer_blackjack = True
-    if player_points < 21 :
+    if player_points < 21 and will_surrender != "YES":
         will_hit = "NO"
         will_double_down = input("Would you like to double down? Enter YES or NO.\n")
         # When a player doubles down their bet is doubled and they are dealt exactly 1 more card
         if will_double_down.upper() == "YES":
             player_points = double_down(player_hand, bet, player_points)
-            """if bet * 2 > money:
-                bet_question = input("You don't have enough money to double your bet. Would you like to bet all you have? Enter YES or NO.").upper()
-                if bet_question == "YES":
-                    bet = money
-                else:
-                    bet = bet
-            else:
-                bet *= 2
-            player_hand.append(new_decks.pop())
-            player_points += player_hand[2][2]
-            count += player_hand[2][3]
-
-            # ace handling code modifies an ace's point value from 11 to 1 if the total hand value is > 21
-            # and the hand contains an ace that hasn't yet had its value decreased from 11 to 1
-            ace = contains_ace(player_hand)
-            has_ace = ace[0]
-            for i in range(2):
-                if player_points > 21 and has_ace == True:
-                    index_of_ace = ace[1]
-                    player_hand[index_of_ace][2] = 1
-                    player_points -= 10
-                    ask_to_hit_again = False
-                ace = contains_ace(player_hand)                    
-                has_ace = ace[0]
-            player_card_reader(player_hand, player_points)
-            print(get_count())"""
         else:
             will_hit = input("Would you like to hit? Enter YES or NO\n")
         if will_hit.upper() == "YES" and player_points < 21 and will_double_down.upper() != "YES":
             player_points = hit(player_hand, player_points, will_hit)
-        """player_index = 2
-        while hit.upper() == "YES" and player_points < 21 and double_down != "YES":
-            ask_to_hit_again = True
-            player_hand.append(new_decks.pop())
-            player_points += player_hand[player_index][2]
-            count += player_hand[player_index][3]
-            player_index += 1
-            ace = contains_ace(player_hand)
-            has_ace = ace[0]
-            player_card_reader(player_hand, player_points)
-            if (player_points > 21 and has_ace == False) or player_points > 31 :
-                hit = "NO"
-                ask_to_hit_again = False
-            elif player_points > 21 and has_ace == True:
-                index_of_ace = ace[1]
-                player_hand[index_of_ace][2] = 1
-                player_points -= 10
-                ask_to_hit_again = False
-                print(get_count())
-                if player_points < 21:
-                
-                    hit = input("Would you like to hit? Enter YES or NO\n")
-            elif player_points == 21:
-                print("Congrats! You have 21. No more hitting for you.")
-                hit = "NO"
-                ask_to_hit_again = False
-                print(get_count())
-            elif player_points < 21 and ask_to_hit_again == True:
-                hit = input("Would you like to hit? Enter YES or NO\n")"""
-    print("The dealer has flipped his concealed card.")
 
+    print("The dealer has flipped his concealed card.")
     dealer_card_reader(dealer_hand, 3)
     count += dealer_hand[1][3]
     print(get_count())
     dealer_index = 2
-
     # Rules require that if the dealer has < 17 points then he must hit until the value 
     # is 17 or greater. The dealer stops hitting once they reach or exceed 17
     while dealer_points < 17 and dealer_points < 21:
@@ -301,7 +328,7 @@ def deal():
         dealer_card_reader(dealer_hand, 3)
         print(get_count())
     # line below has been unindented
-    who_won(player_points, dealer_points, bet, "You", player_blackjack, dealer_blackjack)
+    who_won(player_points, dealer_points, bet, "You", player_blackjack, dealer_blackjack, will_surrender)
     print("The count is " + str(count) + ".\n")
     new_hand = input("Would you like to play another hand? Enter YES or NO \n")
     if new_hand.upper() == "YES":
