@@ -30,7 +30,6 @@ def get_dealer_hand():
 
 # Robot players will be dealt 2 cards each at the beginning of a turn. They won't hit or double down>
 # Robot players are there to allow the real player to see and count more cards per turn
-
 def deal_robot_players(charles_hand, isaac_hand):
     global count
     isaac_hand.append(new_decks.pop())
@@ -59,6 +58,17 @@ def player_card_reader(p_hand, points, hand_number):
         points -= 10
     final_string = start_string[:-9] + ". That's " + str(points) + " points." 
     print(final_string)
+
+# printing hands when splitting
+def read_miltiple_hands(split_cards_hands, will_split_list, hand_points_list):
+    if len(split_cards_hands) > 0:
+        player_card_reader(split_cards_hands[0], hand_points_list[0], 0)
+    if len(split_cards_hands) > 1:
+        player_card_reader(split_cards_hands[1], hand_points_list[1], 1)
+    if len(split_cards_hands) > 2:
+        player_card_reader(split_cards_hands[2], hand_points_list[2], 2)
+    if len(split_cards_hands) > 3:
+        player_card_reader(split_cards_hands[3], hand_points_list[3], 3)
 
 def dealer_card_reader(d_hand, add_length):
     points_showing = d_hand[0][2]
@@ -99,9 +109,11 @@ def double_down(p_hand, bet, player_points):
             ask_to_hit_again = False
         ace = contains_ace(p_hand)                    
         has_ace = ace[0]
-    player_card_reader(p_hand, player_points)
+    player_card_reader(p_hand, player_points, 0)
     print(get_count())
     return player_points
+
+
 
 def hit(p_hand, player_points, will_hit):
     global count
@@ -171,20 +183,30 @@ def can_split(split_cards_hands):
             return True
     return False
     
-def split_cards(split_cards_hands):
+def split_cards(split_cards_hands, will_split_list, hand_points_list):
    # hand_number = 0
     will_split = "NO"
     for hand in split_cards_hands:
         # adding player_card_reader
-        
+        hand_index = split_cards_hands.index(hand)
         will_split_list.append("YES")
-        for i in range(len(split_cards_hands)):
-            h_points = 0
-            for j in range(len(hand) - 1):
-                h_points += hand[j][2]
-            hand_number = i
-            player_card_reader(split_cards_hands[i], h_points, hand_number)
-        if hand[0][2] == hand[1][2] and hand[2] == "YES":
+        #for i in range(len(split_cards_hands)):
+        i = hand_index
+        print(str(i))
+        h_points = hand_points(split_cards_hands[i])
+        hand_points_list[i] = h_points
+        read_miltiple_hands(split_cards_hands, will_split_list, hand_points_list)
+        #print(str(split_cards_hands[i]) + " " + str(hand_points_list[i]))
+        #for i in range(len(split_cards_hands)):
+        #    h_points = hand_points(split_cards_hands[i])
+        #   hand_points_list[i] = h_points
+        #    print(str(split_cards_hands[i]) + " " + str(hand_points_list[i]))
+        #for hand in split_cards_hands:
+            #index_of_hand = split_cards_hands.index(hand)
+            #h_points = hand_points(hand)
+            #hand_points_list[index_of_hand]= h_points
+            #player_card_reader(hand, hand_points_list[index_of_hand], index_of_hand)
+        if hand[0][2] == hand[1][2] and will_split_list[hand_index] == "YES" and len(split_cards_hands) < 4:
             #hand_number += 1
             #adding player_card_reader
             #h_points = 0
@@ -193,16 +215,20 @@ def split_cards(split_cards_hands):
             #hand_number = split_cards_hands.index(hand) + 1
             #player_card_reader(hand, h_points, hand_number)
             will_split = input("You can split hand " + str(split_cards_hands.index(hand) + 1) + " would you like to?\n").upper()
-            hand_index = split_cards_hands.index[hand]
+            
             will_split_list[hand_index] = will_split
             print(will_split)
             if will_split == "YES":
                 split_cards_hands.append([hand[1], new_decks.pop()])
                 hand[1] = new_decks.pop()
-                print(split_cards_hands)
+                for hand in split_cards_hands:
+                    index_of_current_hand = split_cards_hands.index(hand)
+                    hand_points_list[index_of_current_hand] = hand_points(hand)
+                #print(hand)
             else:
                 break
-        #for h in split_cards_hands:
+        
+        #for hand in split_cards_hands:
             #print(hand)
 def hand_points(player_hand):
     hand_points = 0
@@ -224,6 +250,7 @@ def deal():
     dealer_points = 0
     player_hand = []
     player_points = 0
+    hand_points_list = [0, 0, 0, 0]
     split_cards_hands = [player_hand]
     will_split_list = []
     split_cards_points = []
@@ -248,17 +275,18 @@ def deal():
     if contains_ace(player_hand)[0] and player_points > 21:
         player_points -= 10
         contains_ace(player_hand)[1] = 1
-    player_card_reader(player_hand, player_points, 0)
+    #player_card_reader(player_hand, player_points, 0)
 
-    print(player_hand)
+    #print(player_hand)
 
     print(can_split(player_hand))
     will_split = "YES"
     # runs through hands to split if wanted
-    for i in range(3):
-        if can_split(split_cards_hands):
-            split_cards(split_cards_hands) 
-
+    #for i in range(3):
+    for cards in split_cards_hands:
+        if can_split(split_cards_hands) and len(split_cards_hands) < 4:
+            split_cards(split_cards_hands, will_split_list, hand_points_list) 
+            print("testing")
     """while can_split(split_cards_hands) == True and len(split_cards_hands) < 4:
         #can_split(split_cards_hands)
         #split_cards(split_cards_hands)  
