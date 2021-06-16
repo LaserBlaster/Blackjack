@@ -126,7 +126,7 @@ def hit(p_hand, player_points, will_hit):
         player_index += 1
         ace = contains_ace(p_hand)
         has_ace = ace[0]
-        player_card_reader(p_hand, player_points)
+        player_card_reader(p_hand, player_points, player_index)
         if (player_points > 21 and has_ace == False) or player_points > 31 :
             will_hit = "NO"
             ask_to_hit_again = False
@@ -184,50 +184,64 @@ def can_split(split_cards_hands):
     return False
     
 def split_cards(split_cards_hands, will_split_list, hand_points_list):
-   # hand_number = 0
-    will_split = "NO"
+    # hand_number = 0
+    global count
+    #testing removing initialization of will_split
+    #will_split = "NO"
     for hand in split_cards_hands:
         # adding player_card_reader
         hand_index = split_cards_hands.index(hand)
-        will_split_list.append("YES")
+        #will_split_list.append("YES")
         #for i in range(len(split_cards_hands)):
         i = hand_index
         print(str(i))
         h_points = hand_points(split_cards_hands[i])
         hand_points_list[i] = h_points
         read_miltiple_hands(split_cards_hands, will_split_list, hand_points_list)
-        #print(str(split_cards_hands[i]) + " " + str(hand_points_list[i]))
-        #for i in range(len(split_cards_hands)):
-        #    h_points = hand_points(split_cards_hands[i])
-        #   hand_points_list[i] = h_points
-        #    print(str(split_cards_hands[i]) + " " + str(hand_points_list[i]))
-        #for hand in split_cards_hands:
-            #index_of_hand = split_cards_hands.index(hand)
-            #h_points = hand_points(hand)
-            #hand_points_list[index_of_hand]= h_points
-            #player_card_reader(hand, hand_points_list[index_of_hand], index_of_hand)
-        if hand[0][2] == hand[1][2] and will_split_list[hand_index] == "YES" and len(split_cards_hands) < 4:
-            #hand_number += 1
-            #adding player_card_reader
-            #h_points = 0
-            #for i in range(len(hand) - 1):
-            #    h_points += hand[i][2]
-            #hand_number = split_cards_hands.index(hand) + 1
-            #player_card_reader(hand, h_points, hand_number)
+        #trying to make it ask for previous hands
+        for j in range(i+1):
+            if split_cards_hands[j][0][2] == split_cards_hands[j][1][2] and len(split_cards_hands) < 4 and will_split_list[j] == "YES":
+                will_split = input("You can split hand " + str(j + 1) + " would you like to?\n").upper()
+                will_split_list[j] = will_split
+                #print(will_split)
+                if will_split_list[j] == "YES":
+                    new_card_1 = new_decks.pop()
+                    count += new_card_1[3]
+                    split_cards_hands.append([split_cards_hands[j][1], new_card_1])
+                    new_card_2 = new_decks.pop()
+                    count += new_card_2[3]
+                    split_cards_hands[j][1] = new_card_2
+                    print(split_cards_hands[j])
+                    hand_points_list[j] = hand_points(split_cards_hands[j])
+                    #for hand in split_cards_hands:
+                        #index_of_current_hand = split_cards_hands.index(hand)
+                        #print(index_of_current_hand)
+                        #hand_points_list[index_of_current_hand] = hand_points(hand)
+                    #print(hand)
+
+        #function above just a test
+        #Commenting out below for test Test will likely fail
+        """if hand[0][2] == hand[1][2] and will_split_list[hand_index] == "YES" and len(split_cards_hands) < 4:
+
             will_split = input("You can split hand " + str(split_cards_hands.index(hand) + 1) + " would you like to?\n").upper()
             
             will_split_list[hand_index] = will_split
             print(will_split)
             if will_split == "YES":
-                split_cards_hands.append([hand[1], new_decks.pop()])
-                hand[1] = new_decks.pop()
+                new_card_1 = new_decks.pop()
+                count += new_card_1[3]
+                split_cards_hands.append([hand[1], new_card_1])
+                new_card_2 = new_decks.pop()
+                count += new_card_2[3]
+                hand[1] = new_card_2
                 for hand in split_cards_hands:
                     index_of_current_hand = split_cards_hands.index(hand)
                     hand_points_list[index_of_current_hand] = hand_points(hand)
                 #print(hand)
             else:
                 break
-        
+        """
+        print(count)
         #for hand in split_cards_hands:
             #print(hand)
 def hand_points(player_hand):
@@ -252,7 +266,7 @@ def deal():
     player_points = 0
     hand_points_list = [0, 0, 0, 0]
     split_cards_hands = [player_hand]
-    will_split_list = []
+    will_split_list = ["YES", "YES", "YES", "YES"]
     split_cards_points = []
     charles_hand = []
     isaac_hand = []
@@ -262,7 +276,7 @@ def deal():
     
     # Initializing the player's hand
     # uncomment 2 lines below
-    #player_hand.append(new_decks.pop())
+    #layer_hand.append(new_decks.pop())
     #player_hand.append(new_decks.pop())
     # testing split delete two lines below after testing
     player_hand.append(["Queen", "Spades", 10, -1])
@@ -282,11 +296,12 @@ def deal():
     print(can_split(player_hand))
     will_split = "YES"
     # runs through hands to split if wanted
-    #for i in range(3):
-    for cards in split_cards_hands:
-        if can_split(split_cards_hands) and len(split_cards_hands) < 4:
-            split_cards(split_cards_hands, will_split_list, hand_points_list) 
-            print("testing")
+    # commenting out three lines below to test
+    #for cards in split_cards_hands:
+        #if can_split(split_cards_hands) and len(split_cards_hands) < 4:
+            #split_cards(split_cards_hands, will_split_list, hand_points_list) 
+            #print("testing")
+    split_cards(split_cards_hands, will_split_list, hand_points_list) 
     """while can_split(split_cards_hands) == True and len(split_cards_hands) < 4:
         #can_split(split_cards_hands)
         #split_cards(split_cards_hands)  
