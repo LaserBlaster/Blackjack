@@ -126,10 +126,14 @@ def hit(p_hand, player_points, will_hit, split_cards_hands, hand_points_list):
     hand_index = split_cards_hands.index(p_hand)
     while will_hit.upper() == "YES" and player_points < 21:
         ask_to_hit_again = True
+        #trying to get it to append to next hand
         p_hand.append(new_decks.pop())
         player_points = hand_points(p_hand)
         count += p_hand[player_index][3]
         player_index += 1
+        #hand_index += 1
+        #split_cards_hands[hand_index].append(new_decks.pop())
+
         player_card_reader(p_hand, split_cards_hands)
         if player_points > 21:
             will_hit = "NO"
@@ -142,8 +146,11 @@ def hit(p_hand, player_points, will_hit, split_cards_hands, hand_points_list):
             ask_to_hit_again = False
             print(get_count())
         elif player_points < 21 and ask_to_hit_again == True:
-                will_hit = input("Would you like to hit? Enter YES or NO\n")
-    hand_points_list[hand_index] = player_points
+            player_card_reader(p_hand, split_cards_hands)
+            print("For hand number " + str(hand_index + 1))
+            will_hit = input("Would you like to hit? Enter YES or NO\n")
+        hand_points_list[hand_index] = player_points
+        #player_card_reader(p_hand, split_cards_hands)
     return player_points
 
 def who_won(player_points, dealer_points, bet, player_name, player_blackjack, dealer_blackjack, will_surrender):
@@ -263,9 +270,12 @@ def deal():
     # uncomment 2 lines below
     #player_hand.append(new_decks.pop())
     #player_hand.append(new_decks.pop())
-    # testing split delete two lines below after testing
-    player_hand.append(["Queen", "Spades", 10, -1])
-    player_hand.append(["King", "Clubs", 10, -1])
+    # testing split with ten value cards delete two lines below after testing
+    #player_hand.append(["Queen", "Spades", 10, -1])
+    #player_hand.append(["King", "Clubs", 10, -1])
+    # testing split with twos
+    player_hand.append(["Three", "Diamonds", 3, 1])
+    player_hand.append(["Three", "Hearts", 3, 1])
     print(player_hand)
     count += player_hand[0][3]
     count += player_hand[1][3]
@@ -304,12 +314,7 @@ def deal():
             split_cards(split_cards_hands, will_split_list, hand_points_list)    
         for hands in split_cards_hands:
             index_of_hand = split_cards_hands.index(hands)
-            dealer_blackjack = False
-            if player_points == 21:
-                player_blackjack_list[index_of_hand] = True
-            if dealer_points == 21:
-                dealer_blackjack = True
-            if player_blackjack_list[index_of_hand] != True and dealer_blackjack != True and index_of_hand > 0:
+            if len(split_cards_hands) > 1:
                 print("For hand number " + str(index_of_hand + 1))
                 will_surrender_list[index_of_hand] = input("Would you like to surrender?\n").upper()
             if player_blackjack_list[index_of_hand] != True and will_surrender_list[index_of_hand] != "YES" and dealer_blackjack != True:
@@ -322,8 +327,8 @@ def deal():
                 else:
                     print("For hand number " + str(index_of_hand + 1))
                     will_hit = input("Would you like to hit? Enter YES or NO\n")
-                if will_hit.upper() == "YES" and player_points < 21 and will_double_down.upper() != "YES":
-                    player_points = hit(player_hand, player_points, will_hit, split_cards_hands, hand_points_list)
+                if will_hit.upper() == "YES" and hand_points_list[index_of_hand] < 21 and will_double_down.upper() != "YES":
+                    player_points = hit(split_cards_hands[index_of_hand], player_points, will_hit, split_cards_hands, hand_points_list)
 
     print("The dealer has flipped his concealed card.")
     dealer_card_reader(dealer_hand, 3)
